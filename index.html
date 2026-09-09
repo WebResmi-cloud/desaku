@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Layanan Pengaduan Masyarakat Desa</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f9;
+            color: #333;
+        }
+        header {
+            background-color: #1b5e20;
+            color: white;
+            padding: 25px 15px;
+            text-align: center;
+        }
+        header h1 {
+            margin: 0 0 10px 0;
+            font-size: 24px;
+        }
+        header p {
+            margin: 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #1b5e20;
+            border-bottom: 2px solid #1b5e20;
+            padding-bottom: 8px;
+            font-size: 18px;
+            margin-top: 0;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .btn-submit {
+            background-color: #25d366;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+        }
+        .btn-submit:hover {
+            background-color: #1ebd56;
+        }
+        .btn-submit:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        footer {
+            text-align: center;
+            padding: 15px;
+            background-color: #e0e0e0;
+            margin-top: 30px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>LAYANAN PENGADUAN MASYARAKAT</h1>
+        <H1>DESA TELUKNAGA</H1>
+        <p>Sampaikan aspirasi dan laporan Anda demi kemajuan desa kita</p>
+    </header>
+
+    <div class="container">
+        <h2>Formulir Laporan Pengaduan</h2>
+        
+        <form id="formPengaduan">
+            
+            <div class="form-group">
+                <label for="nik">NIK (Nomor Induk Kependudukan):</label>
+                <input type="text" id="nik" name="nik" placeholder="Masukkan 16 digit NIK" maxlength="16" required>
+            </div>
+
+            <div class="form-group">
+                <label for="nama">Nama Lengkap:</label>
+                <input type="text" id="nama" name="nama" placeholder="Masukkan nama sesuai KTP" required>
+            </div>
+
+            <div class="form-group">
+                <label for="telepon">Nomor WhatsApp Pelapor:</label>
+                <input type="tel" id="telepon" name="telepon" placeholder="Contoh: 08123456789" maxlength="13" required>
+            </div>
+
+            <div class="form-group">
+                <label for="kategori">Kategori Pengaduan:</label>
+                <select id="kategori" name="kategori" required>
+                    <option value="">-- Pilih Kategori --</option>
+                    <option value="Infrastruktur & Jalan">Infrastruktur & Jalan</option>
+                    <option value="Pelayanan Administrasi Desa">Pelayanan Administrasi Desa</option>
+                    <option value="Keamanan & Ketertiban">Keamanan & Ketertiban</option>
+                    <option value="Kebersihan & Lingkungan">Kebersihan & Lingkungan</option>
+                    <option value="Lainnya">Lainnya</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="judul">Judul Laporan:</label>
+                <input type="text" id="judul" name="judul" placeholder="Ringkasan singkat aduan" required>
+            </div>
+
+            <div class="form-group">
+                <label for="isi_laporan">Isi Laporan / Detail Aduan:</label>
+                <textarea id="isi_laporan" name="isi_laporan" rows="5" placeholder="Jelaskan detail kejadian, lokasi, atau permasalahan secara lengkap" required></textarea>
+            </div>
+
+            <button type="submit" id="btnSubmit" class="btn-submit">📱 Simpan & Kirim via WhatsApp</button>
+
+        </form>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Pemerintah Desa. Semua Hak Dilindungi.</p>
+    </footer>
+
+    <script>
+        // ---------------------------------------------------------------------
+        // 1. GANTI DENGAN URL GOOGLE APPS SCRIPT ANDA DARI LANGKAH 2
+        // ---------------------------------------------------------------------
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbz4OY-k9H72PeiAVzGCbodmZyfBSuq6q5OwR5umDHHqQ90t3zf4T42b4wYYwsxEMgE3/exec'; 
+
+        // ---------------------------------------------------------------------
+        // 2. GANTI DENGAN NOMOR WHATSAPP ADMIN DESA
+        // ---------------------------------------------------------------------
+        let nomorWA = "085888233258"; 
+
+
+        const form = document.getElementById('formPengaduan');
+    const btnSubmit = document.getElementById('btnSubmit');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        btnSubmit.disabled = true;
+        btnSubmit.innerText = '⏳ Menyimpan ke Database...';
+
+        const formData = new FormData(form);
+
+        // Kirim data ke Google Sheets
+        fetch(scriptURL, { method: 'POST', body: formData })
+            .then(response => {
+                let nik = document.getElementById('nik').value;
+                let nama = document.getElementById('nama').value;
+                let telepon = document.getElementById('telepon').value;
+                let kategori = document.getElementById('kategori').value;
+                let judul = document.getElementById('judul').value;
+                let isi = document.getElementById('isi_laporan').value;
+
+                let formattedWA = nomorWA.replace(/^0/, '62');
+
+                // Menyusun teks mentah
+                let teksPesan = `*LAPORAN PENGADUAN DESA TELUKNAGA*\n` +
+                                `------------------------------------\n` +
+                                `*NIK                       :* ${nik}\n` +
+                                `*Nama Pelapor    :* ${nama}\n` +
+                                `*No. HP/WA         :* ${telepon}\n` +
+                                `*Kategori              :* ${kategori}\n` +
+                                `*Judul Laporan    :* ${judul}\n` +
+                                `------------------------------------\n` +
+                                `*Detail Laporan:*\n${isi}\n\n` +
+                                `_Laporan ini telah tersimpan di sistem Google Sheets Desa._`;
+
+                // MENGGUNAKAN encodeURIComponent AGAR SEMUA TEKS & ISI LAPORAN TERKIRIM UTUH
+                let pesanEncoded = encodeURIComponent(teksPesan);
+
+                let urlWA = `https://api.whatsapp.com/send?phone=${formattedWA}&text=${pesanEncoded}`;
+
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = '📱 Simpan & Kirim via WhatsApp';
+
+                form.reset();
+                window.open(urlWA, '_blank');
+            })
+            .catch(error => {
+                alert('Gagal menyimpan laporan. Silakan coba lagi.');
+                console.error('Error!', error.message);
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = '📱 Simpan & Kirim via WhatsApp';
+            });
+    });
+</script>
+
+</body>
+</html>
