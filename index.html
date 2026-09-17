@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Layanan Pengaduan Masyarakat Desa Teluknaga</title>
-    <!-- Google Fonts & FontAwesome Icons -->
+    <title>Portal Resmi Desa Teluknaga</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root {
             --primary-color: #1b5e20;
-            --primary-hover: #144417;
             --wa-color: #25d366;
             --wa-hover: #1ebd56;
             --bg-color: #f0f4f8;
@@ -21,14 +20,9 @@
             --text-main: #2d3748;
             --text-muted: #718096;
             --border-color: #e2e8f0;
-            --focus-ring: rgba(27, 94, 32, 0.15);
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -38,269 +32,490 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            overflow-x: hidden;
         }
 
-        /* Header Styling */
-        header {
-            background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
-            color: white;
-            padding: 40px 20px 60px 20px;
-            text-align: center;
-            position: relative;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        /* --- ANIMASI SCROLL & TEKS --- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(35px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        .header-badge {
-            display: inline-block;
-            background-color: rgba(255, 255, 255, 0.15);
-            padding: 4px 16px;
-            border-radius: 50px;
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-bottom: 12px;
-            backdrop-filter: blur(4px);
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.92);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-scale.active {
+            opacity: 1;
+            transform: scale(1);
         }
 
-        header h1 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            line-height: 1.3;
+        .reveal-text {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.active .reveal-text, .reveal-text.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal-text:nth-child(1) { transition-delay: 0.1s; }
+        .reveal-text:nth-child(2) { transition-delay: 0.2s; }
+        .reveal-text:nth-child(3) { transition-delay: 0.3s; }
+        /* ------------------------------------- */
+
+        .top-bar {
+            background-color: #1a202c; color: #a0aec0; font-size: 12px; padding: 8px 5%;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 5px;
         }
 
-        header p {
-            font-size: 14px;
-            opacity: 0.9;
-            max-width: 500px;
-            margin: 0 auto;
-            font-weight: 400;
+        .navbar {
+            background-color: rgba(27, 94, 32, 0.95); backdrop-filter: blur(8px); color: white;
+            padding: 15px 5%; display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
-        /* Main Container */
-        .container {
-            max-width: 600px;
-            width: 90%;
-            margin: -35px auto 40px auto;
-            padding: 30px;
-            background-color: var(--card-bg);
-            border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
-            position: relative;
-            z-index: 10;
-        }
-
-        .form-header {
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid var(--bg-color);
+        .nav-brand { font-weight: 700; font-size: 18px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        
+        .nav-container {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 25px;
         }
 
-        .form-header i {
-            font-size: 20px;
-            color: var(--primary-color);
-        }
+        .nav-menu { list-style: none; display: flex; gap: 25px; align-items: center; }
 
-        .form-header h2 {
-            color: var(--primary-color);
-            font-size: 20px;
-            font-weight: 700;
-        }
+        .nav-menu li a { color: white; text-decoration: none; font-size: 14px; font-weight: 500; cursor: pointer; transition: opacity 0.2s; }
+        .nav-menu li a:hover, .nav-menu li a.active { opacity: 0.75; border-bottom: 2px solid white; padding-bottom: 2px; }
 
-        /* Form Groups */
-        .form-group {
-            margin-bottom: 20px;
+        .btn-login {
+            background-color: transparent; border: 1.5px solid white; color: white;
+            padding: 6px 18px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer;
+            transition: background 0.2s;
         }
+        .btn-login:hover { background-color: rgba(255,255,255,0.1); }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            font-size: 13.5px;
-            color: var(--text-main);
-        }
-
-        .form-group label i {
-            margin-right: 6px;
-            color: var(--text-muted);
-            width: 16px;
-        }
-
-        .form-group input, 
-        .form-group select, 
-        .form-group textarea {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1.5px solid var(--border-color);
-            border-radius: 10px;
-            font-size: 14px;
-            font-family: inherit;
-            color: var(--text-main);
-            background-color: #fafafa;
-            transition: all 0.25s ease;
-        }
-
-        .form-group input:focus, 
-        .form-group select:focus, 
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            background-color: #ffffff;
-            box-shadow: 0 0 0 4px var(--focus-ring);
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 110px;
-        }
-
-        /* Submit Button */
-        .btn-submit {
-            background-color: var(--wa-color);
-            color: white;
-            padding: 15px 24px;
+        .menu-toggle {
+            display: none;
+            background: none;
             border: none;
-            border-radius: 10px;
+            color: white;
+            font-size: 22px;
             cursor: pointer;
-            font-size: 15px;
-            font-weight: 700;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
-            transition: all 0.25s ease;
-            margin-top: 10px;
         }
 
-        .btn-submit:hover {
-            background-color: var(--wa-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 15px rgba(37, 211, 102, 0.4);
+        .page-section { display: none; }
+        .page-section.active-section { display: block; }
+
+        .hero-section {
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat;
+            color: white; padding: 80px 20px; text-align: center;
         }
 
-        .btn-submit:disabled {
-            background-color: #cbd5e1;
-            box-shadow: none;
-            cursor: not-allowed;
-            transform: none;
+        .hero-section h1 { font-size: clamp(24px, 4vw, 32px); font-weight: 700; margin-bottom: 15px; max-width: 700px; margin-left: auto; margin-right: auto; }
+        .hero-section p { font-size: clamp(14px, 2vw, 16px); margin-bottom: 30px; max-width: 600px; margin-left: auto; margin-right: auto; opacity: 0.9; }
+
+        .btn-hero-primary {
+            background-color: var(--wa-color); color: white; padding: 12px 24px;
+            border-radius: 8px; text-decoration: none; font-weight: 600; cursor: pointer; border: none; font-size: 15px;
+            display: inline-flex; align-items: center; gap: 8px; transition: background 0.2s;
+        }
+        .btn-hero-primary:hover { background-color: var(--wa-hover); }
+
+        .stats-wrapper {
+            max-width: 1000px; width: 90%; margin: -40px auto 40px auto; background: #ffffff;
+            padding: 30px; border-radius: 20px; box-shadow: 0 15px 30px rgba(0,0,0,0.06); position: relative; z-index: 10;
         }
 
-        /* Footer */
+        .stats-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 30px; align-items: center; }
+        .stats-cards-left { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .stat-card { background: #ffffff; border: 1px solid var(--border-color); padding: 20px 15px; border-radius: 12px; text-align: center; transition: transform 0.3s; }
+        .stat-card:hover { transform: translateY(-5px); border-color: var(--primary-color); }
+        .stat-card h3 { font-size: clamp(22px, 3vw, 28px); font-weight: 700; color: var(--text-main); margin-bottom: 5px; }
+        .stat-card p { font-size: 13px; font-weight: 600; color: #ff6b6b; text-transform: uppercase; }
+
+        .stats-right-chart { text-align: center; background: #fafbfc; padding: 20px; border-radius: 16px; border: 1px solid var(--border-color); }
+        .chart-container { position: relative; width: 180px; height: 180px; margin: 0 auto 15px auto; }
+        .stat-legend-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; background: white; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); font-size: 13px; }
+        .stat-legend-table td { padding: 8px 12px; border-bottom: 1px solid var(--border-color); text-align: left; }
+        .legend-indicator { display: inline-block; width: 12px; height: 12px; border-radius: 2px; margin-right: 8px; }
+
+        .btn-more-stats { background-color: var(--primary-color); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
+        .btn-more-stats:hover { opacity: 0.9; }
+
+        .form-page-header { background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%); color: white; padding: 40px 20px 60px 20px; text-align: center; }
+        .header-badge { display: inline-block; background-color: rgba(255, 255, 255, 0.15); padding: 4px 16px; border-radius: 50px; font-size: 12px; font-weight: 600; text-transform: uppercase; margin-bottom: 12px; }
+
+        .container {
+            max-width: 600px; width: 90%; margin: -35px auto 40px auto; padding: 25px;
+            background-color: var(--card-bg); border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); position: relative; z-index: 10;
+        }
+
+        .form-header { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid var(--bg-color); display: flex; align-items: center; gap: 12px; }
+        .form-header h2 { color: var(--primary-color); font-size: 20px; font-weight: 700; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 13.5px; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 12px 16px; border: 1.5px solid var(--border-color); border-radius: 10px; font-size: 14px; font-family: inherit; background-color: #fafafa;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none; border-color: var(--primary-color); background-color: #fff;
+        }
+        .form-group textarea { resize: vertical; min-height: 110px; }
+
+        .btn-submit {
+            background-color: var(--wa-color); color: white; padding: 15px 24px; border: none; border-radius: 10px; cursor: pointer; font-size: 15px; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;
+            transition: background 0.2s;
+        }
+        .btn-submit:hover { background-color: var(--wa-hover); }
+
+        /* FOOTER */
         footer {
             margin-top: auto;
-            text-align: center;
-            padding: 20px;
-            background-color: #ffffff;
-            border-top: 1px solid var(--border-color);
-            color: var(--text-muted);
-            font-size: 13px;
+            background-color: #1a202c;
+            color: #cbd5e0;
+            padding: 40px 5% 20px 5%;
+            font-size: 14px;
         }
 
-        /* Responsive Breakpoints */
-        @media (max-width: 480px) {
-            header {
-                padding: 30px 15px 50px 15px;
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #2d3748;
+            align-items: start;
+        }
+
+        .footer-left { display: flex; flex-direction: column; gap: 15px; }
+        .footer-brand-row { display: flex; align-items: center; gap: 15px; }
+        .footer-logo { width: 45px; height: 55px; object-fit: contain; }
+        .footer-brand-row h3 { color: #ffffff; font-size: 18px; font-weight: 700; }
+        .footer-brand-row p { color: #a0aec0; font-size: 12px; }
+        .footer-left > p { color: #cbd5e0; font-size: 13.5px; max-width: 600px; }
+
+        .footer-right h4 { color: #ffffff; font-size: 17px; font-weight: 700; margin-bottom: 15px; }
+        .footer-info-list { list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 13.5px; color: #cbd5e0; }
+        .footer-info-list li { display: flex; align-items: flex-start; gap: 10px; }
+        .footer-info-list i { color: #48bb78; margin-top: 4px; }
+        .footer-bottom { text-align: center; padding-top: 20px; color: #718096; font-size: 13px; }
+
+        /* --- RESPONSIVITAS & MENU MOBILE --- */
+        @media(max-width: 900px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .footer-content { grid-template-columns: 1fr; gap: 30px; }
+        }
+
+        @media(max-width: 768px) {
+            .menu-toggle { display: block; }
+            .nav-container {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background-color: rgba(27, 94, 32, 0.98);
+                backdrop-filter: blur(10px);
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 0 5%;
+                gap: 15px;
+                box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease-in-out, padding 0.3s;
             }
-            header h1 {
-                font-size: 20px;
+            .nav-container.show {
+                max-height: 300px;
+                padding: 20px 5%;
             }
-            .container {
-                width: 92%;
-                padding: 20px 18px;
-                margin-top: -30px;
-                border-radius: 12px;
+            .nav-menu {
+                flex-direction: column;
+                align-items: flex-start;
+                width: 100%;
+                gap: 15px;
             }
-            .form-header h2 {
-                font-size: 17px;
-            }
-            .btn-submit {
-                padding: 13px 18px;
-                font-size: 14px;
-            }
+            .nav-menu li { width: 100%; }
+            .nav-menu li a { display: block; width: 100%; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+            .btn-login { width: 100%; text-align: center; padding: 10px; }
+        }
+
+        @media(max-width: 640px) {
+            .top-bar { font-size: 11px; justify-content: center; text-align: center; padding: 6px 15px; }
+            .navbar { padding: 12px 15px; }
+            .hero-section { padding: 50px 15px; }
+            .stats-wrapper { margin: -25px 15px 30px 15px; padding: 20px 15px; width: auto; }
+            .container { margin: -25px 15px 30px 15px; padding: 20px 15px; width: auto; }
+            .stats-cards-left { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <span class="header-badge"><i class="fa-solid fa-shield-halved"></i> Portal Resmi</span>
-        <h1>LAYANAN PENGADUAN MASYARAKAT<br>DESA TELUKNAGA</h1>
-        <p>Sampaikan aspirasi dan laporan Anda secara cepat, transparan, dan terintegrasi.</p>
-    </header>
-
-    <div class="container">
-        <div class="form-header">
-            <i class="fa-solid fa-file-pen"></i>
-            <h2>Formulir Pengaduan</h2>
-        </div>
-        
-        <form id="formPengaduan">
-            
-            <div class="form-group">
-                <label for="nik"><i class="fa-regular fa-id-card"></i> NIK (Nomor Induk Kependudukan)</label>
-                <input type="text" id="nik" name="nik" placeholder="Masukkan 16 digit NIK Anda" maxlength="16" pattern="\d{16}" title="NIK harus terdiri dari 16 angka" required>
-            </div>
-
-            <div class="form-group">
-                <label for="nama"><i class="fa-regular fa-user"></i> Nama Lengkap</label>
-                <input type="text" id="nama" name="nama" placeholder="Sesuai nama di KTP" required>
-            </div>
-
-            <div class="form-group">
-                <label for="telepon"><i class="fa-brands fa-whatsapp"></i> Nomor WhatsApp Pelapor</label>
-                <input type="tel" id="telepon" name="telepon" placeholder="Contoh: 08123456789" maxlength="14" required>
-            </div>
-
-            <div class="form-group">
-                <label for="kategori"><i class="fa-solid fa-layer-group"></i> Kategori Pengaduan</label>
-                <select id="kategori" name="kategori" required>
-                    <option value="">-- Pilih Kategori Pengaduan --</option>
-                    <option value="Infrastruktur & Jalan">Infrastruktur & Jalan</option>
-                    <option value="Pelayanan Administrasi Desa">Pelayanan Administrasi Desa</option>
-                    <option value="Keamanan & Ketertiban">Keamanan & Ketertiban</option>
-                    <option value="Kebersihan & Lingkungan">Kebersihan & Lingkungan</option>
-                    <option value="Lainnya">Lainnya</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="judul"><i class="fa-regular fa-bookmark"></i> Judul Laporan</label>
-                <input type="text" id="judul" name="judul" placeholder="Ringkasan singkat topik aduan" required>
-            </div>
-
-            <div class="form-group">
-                <label for="isi_laporan"><i class="fa-regular fa-comment-dots"></i> Isi Laporan / Detail Aduan</label>
-                <textarea id="isi_laporan" name="isi_laporan" placeholder="Jelaskan detail kejadian, lokasi, atau permasalahan secara jelas..." required></textarea>
-            </div>
-
-            <button type="submit" id="btnSubmit" class="btn-submit">
-                <i class="fa-brands fa-whatsapp" style="font-size: 18px;"></i>
-                <span>Simpan & Kirim via WhatsApp</span>
-            </button>
-
-        </form>
+    <div class="top-bar">
+        <span><i class="fa-solid fa-location-dot"></i> Jl. Raya Teluknaga, Kabupaten Tangerang, Banten</span>
     </div>
 
-    <footer>
-        <p>&copy; 2026 Pemerintah Desa Teluknaga. Semua Hak Dilindungi.</p>
+    <nav class="navbar">
+        <div class="nav-brand" onclick="switchPage('beranda')">
+            <i class="fa-solid fa-landmark"></i> Desa Teluknaga
+        </div>
+        
+        <button class="menu-toggle" id="menuToggle" aria-label="Buka Menu">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <div class="nav-container" id="navContainer">
+            <ul class="nav-menu">
+                <li id="li-beranda"><a onclick="switchPage('beranda')" id="menu-beranda" class="active">Beranda</a></li>
+                <li id="li-profil"><a onclick="switchPage('profil')" id="menu-profil">Profil Desa</a></li>
+                <li id="li-pengaduan"><a onclick="switchPage('pengaduan')" id="menu-pengaduan">Pengaduan</a></li>
+            </ul>
+            <button class="btn-login" onclick="alert('Fitur login segera hadir.')">Login</button>
+        </div>
+    </nav>
+
+    <!-- BERANDA -->
+    <div id="section-beranda" class="page-section active-section">
+        <div class="hero-section reveal">
+            <span class="header-badge reveal-text"><i class="fa-solid fa-shield-halved"></i> Website Resmi Pelayanan Desa</span>
+            <h1 class="reveal-text">Pemerintah Desa Teluknaga<br>Website Pelayanan Online Terpadu Desa Teluknaga</h1>
+            <p class="reveal-text">Sampaikan aspirasi, kritik, saran, maupun laporan pengaduan infrastruktur dan layanan administrasi desa dengan cepat & transparan.</p>
+            <div class="hero-buttons reveal-text">
+                <button class="btn-hero-primary" onclick="switchPage('pengaduan')">
+                    <i class="fa-solid fa-file-pen"></i> Buat Pengaduan Sekarang
+                </button>
+            </div>
+        </div>
+
+        <div class="stats-wrapper reveal-scale">
+            <div class="stats-grid">
+                <div class="stats-cards-left">
+                    <div class="stat-card"><h3><span id="stat-penduduk">...</span></h3><p>Penduduk</p></div>
+                    <div class="stat-card"><h3><span id="stat-kk">...</span></h3><p>KK</p></div>
+                    <div class="stat-card"><h3><span id="stat-rw">...</span></h3><p>RW</p></div>
+                    <div class="stat-card"><h3><span id="stat-rt">...</span></h3><p>RT</p></div>
+                </div>
+
+                <div class="stats-right-chart">
+                    <div class="chart-container"><canvas id="statistikChart"></canvas></div>
+                    <h4>Statistik Penduduk</h4>
+                    <table class="stat-legend-table">
+                        <tr><td><span class="legend-indicator" style="background-color: #2ecc71;"></span>Laki Laki</td><td id="val-laki" style="text-align: right; font-weight: bold;">...</td></tr>
+                        <tr><td><span class="legend-indicator" style="background-color: #7f8c8d;"></span>Perempuan</td><td id="val-perempuan" style="text-align: right; font-weight: bold;">...</td></tr>
+                    </table>
+                    <button class="btn-more-stats" onclick="loadStatistikData()">Refresh Data</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PROFIL -->
+    <div id="section-profil" class="page-section">
+        <div class="container reveal" style="margin-top: 50px; text-align: center;">
+            <h2 class="reveal-text" style="color: var(--primary-color); margin-bottom: 15px;">Profil Desa Teluknaga</h2>
+            <p class="reveal-text">Desa Teluknaga merupakan pusat pelayanan masyarakat yang berkomitmen memberikan keterbukaan informasi transparan.</p>
+            <br>
+            <div class="reveal-text">
+                <button class="btn-hero-primary" onclick="switchPage('beranda')" style="width: auto; display:inline-block;">Kembali ke Beranda</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PENGADUAN -->
+    <div id="section-pengaduan" class="page-section">
+        <div class="form-page-header reveal">
+            <span class="header-badge reveal-text"><i class="fa-solid fa-shield-halved"></i> Portal Resmi</span>
+            <h1 class="reveal-text">LAYANAN PENGADUAN MASYARAKAT</h1>
+            <h1 class="reveal-text">DESA Teluknaga</h1>
+            <p class="reveal-text">Sampaikan aspirasi dan laporan Anda secara cepat, transparan, dan terintegrasi.</p>
+        </div>
+
+        <div class="container reveal-scale">
+            <div class="form-header">
+                <i class="fa-solid fa-file-pen" style="font-size: 20px; color: var(--primary-color);"></i>
+                <h2>Formulir Pengaduan</h2>
+            </div>
+            
+            <form id="formPengaduan">
+                <div class="form-group">
+                    <label for="nik"><i class="fa-regular fa-id-card"></i> NIK</label>
+                    <input type="text" id="nik" name="nik" placeholder="Masukkan 16 digit NIK Anda" maxlength="16" required>
+                </div>
+                <div class="form-group">
+                    <label for="nama"><i class="fa-regular fa-user"></i> Nama Lengkap</label>
+                    <input type="text" id="nama" name="nama" placeholder="Sesuai KTP" required>
+                </div>
+                <div class="form-group">
+                    <label for="telepon"><i class="fa-brands fa-whatsapp"></i> No. WhatsApp</label>
+                    <input type="tel" id="telepon" name="telepon" placeholder="Contoh: 08123456789" required>
+                </div>
+                <div class="form-group">
+                    <label for="kategori"><i class="fa-solid fa-layer-group"></i> Kategori</label>
+                    <select id="kategori" name="kategori" required>
+                        <option value="">-- Pilih Kategori --</option>
+                        <option value="Infrastruktur & Jalan">Infrastruktur & Jalan</option>
+                        <option value="Pelayanan Administrasi Desa">Pelayanan Administrasi Desa</option>
+                        <option value="Keamanan & Ketertiban">Keamanan & Ketertiban</option>
+                        <option value="Kebersihan & Lingkungan">Kebersihan & Lingkungan</option>
+                        <option value="Lainnya">Lainnya</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="judul"><i class="fa-regular fa-bookmark"></i> Judul Laporan</label>
+                    <input type="text" id="judul" name="judul" placeholder="Ringkasan aduan" required>
+                </div>
+                <div class="form-group">
+                    <label for="isi_laporan"><i class="fa-regular fa-comment-dots"></i> Isi Laporan</label>
+                    <textarea id="isi_laporan" name="isi_laporan" placeholder="Jelaskan detail kejadian..." required></textarea>
+                </div>
+                <button type="submit" id="btnSubmit" class="btn-submit">
+                    <i class="fa-brands fa-whatsapp" style="font-size: 18px;"></i>
+                    <span>Simpan & Kirim via WhatsApp</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="reveal">
+        <div class="footer-content">
+            <div class="footer-left">
+                <div class="footer-brand-row">
+                    <img src="logokab.png" alt="Logo Desa" class="footer-logo">
+                    <div>
+                        <h3>Pemerintah Desa Teluknaga</h3>
+                        <p>Website Pelayanan Online Terpadu Desa Teluknaga</p>
+                    </div>
+                </div>
+                <p>Menjadi pusat pemerintahan aparatur desa, serta Melaksanakan kegiatan pelayanan dan pemberdayaan masyarakat desa</p>
+            </div>
+            
+            <div class="footer-right">
+                <h4>Detail Informasi</h4>
+                <ul class="footer-info-list">
+                    <li><i class="fa-solid fa-location-dot"></i> <span>Pemerintah Desa Teluknaga</span></li>
+                    <li><i class="fa-solid fa-phone"></i> <span>085888233258</span></li>
+                    <li><i class="fa-solid fa-envelope"></i> <span>Desaku@Gmail.Com</span></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>Copyright Pemerintah Desa Teluknaga 2026. All Right Reserved</p>
+        </div>
     </footer>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbz4OY-k9H72PeiAVzGCbodmZyfBSuq6q5OwR5umDHHqQ90t3zf4T42b4wYYwsxEMgE3/exec'; 
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.15
+        };
+
+        const scrollObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                } else {
+                    entry.target.classList.remove('active');
+                }
+            });
+        }, observerOptions);
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const revealElements = document.querySelectorAll('.reveal, .reveal-scale');
+            revealElements.forEach(el => scrollObserver.observe(el));
+            loadStatistikData();
+        });
+
+        const menuToggle = document.getElementById('menuToggle');
+        const navContainer = document.getElementById('navContainer');
+
+        menuToggle.addEventListener('click', function() {
+            navContainer.classList.toggle('show');
+            const icon = menuToggle.querySelector('i');
+            if (navContainer.classList.contains('show')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-xmark');
+            } else {
+                icon.classList.remove('fa-xmark');
+                icon.classList.add('fa-bars');
+            }
+        });
+
+        function switchPage(pageId) {
+            document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active-section'));
+            document.getElementById('section-' + pageId).classList.add('active-section');
+            document.querySelectorAll('.nav-menu a').forEach(link => link.classList.remove('active'));
+            
+            const activeNav = document.getElementById('menu-' + pageId);
+            if(activeNav) activeNav.classList.add('active');
+            
+            navContainer.classList.remove('show');
+            const icon = menuToggle.querySelector('i');
+            icon.classList.remove('fa-xmark');
+            icon.classList.add('fa-bars');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            setTimeout(() => {
+                const revealElements = document.querySelectorAll('.page-section.active-section .reveal, .page-section.active-section .reveal-scale');
+                revealElements.forEach(el => scrollObserver.observe(el));
+            }, 50);
+        }
+
+        let myChart = null;
+        function initChart(laki, perempuan) {
+            const canvasEl = document.getElementById('statistikChart');
+            if(!canvasEl) return;
+            const ctx = canvasEl.getContext('2d');
+            if(myChart) myChart.destroy();
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Laki Laki', 'Perempuan'],
+                    datasets: [{ data: [laki, perempuan], backgroundColor: ['#2ecc71', '#7f8c8d'], borderWidth: 0 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '65%' }
+            });
+        }
+
+        const scriptURL = 'https://script.google.com/macros/s/AKfycby96KqMiWHsuxrcKh5siAB5IwyTLmUSsAxCKsQK2i55LaeSmGl0Qth8WpTtMzuMJChj/exec'; 
         let nomorWA = "085888233258"; 
+
+        function loadStatistikData() {
+            fetch(scriptURL)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('stat-penduduk').innerText = Number(data.penduduk || 2624).toLocaleString();
+                    document.getElementById('stat-kk').innerText = Number(data.kk || 923).toLocaleString();
+                    document.getElementById('stat-rw').innerText = Number(data.rw || 5).toLocaleString();
+                    document.getElementById('stat-rt').innerText = Number(data.rt || 26).toLocaleString();
+
+                    let laki = Number(data.laki || 1297);
+                    let perempuan = Number(data.perempuan || 1327);
+                    document.getElementById('val-laki').innerText = laki.toLocaleString();
+                    document.getElementById('val-perempuan').innerText = perempuan.toLocaleString();
+                    initChart(laki, perempuan);
+                })
+                .catch(error => {
+                    console.log('Gagal memuat statistik, menggunakan data default.');
+                });
+        }
 
         const form = document.getElementById('formPengaduan');
         const btnSubmit = document.getElementById('btnSubmit');
 
         form.addEventListener('submit', function(e) {
             e.preventDefault();
-
             btnSubmit.disabled = true;
             btnSubmit.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Menyimpan ke Database...`;
 
@@ -314,39 +529,31 @@
                     let kategori = document.getElementById('kategori').value;
                     let judul = document.getElementById('judul').value;
                     let isi = document.getElementById('isi_laporan').value;
-
                     let formattedWA = nomorWA.replace(/^0/, '62');
 
-                    // Menyusun teks mentah
-                    let teksPesan = `*LAPORAN PENGADUAN DESA TELUKNAGA*\n` +
+                    let teksPesan = `*LAPORAN PENGADUAN DESA NGANGUK*\n` +
                                 `------------------------------------\n` +
-                                `*NIK                       :* ${nik}\n` +
-                                `*Nama Pelapor    :* ${nama}\n` +
-                                `*No. HP/WA         :* ${telepon}\n` +
-                                `*Kategori              :* ${kategori}\n` +
-                                `*Judul Laporan    :* ${judul}\n` +
+                                `*NIK:* ${nik}\n` +
+                                `*Nama:* ${nama}\n` +
+                                `*No. HP/WA:* ${telepon}\n` +
+                                `*Kategori:* ${kategori}\n` +
+                                `*Judul:* ${judul}\n` +
                                 `------------------------------------\n` +
-                                `*Detail Laporan:*\n${isi}\n\n` +
-                                `_Laporan ini telah tersimpan di sistem Google Sheets Desa._`;
+                                `*Detail:* \n${isi}`;
 
-                // MENGGUNAKAN encodeURIComponent AGAR SEMUA TEKS & ISI LAPORAN TERKIRIM UTUH
-                    let pesanEncoded = encodeURIComponent(teksPesan);
-                    let urlWA = `https://api.whatsapp.com/send?phone=${formattedWA}&text=${pesanEncoded}`;
+                    let urlWA = `https://api.whatsapp.com/send?phone=${formattedWA}&text=` + encodeURIComponent(teksPesan);
 
                     btnSubmit.disabled = false;
-                    btnSubmit.innerHTML = `<i class="fa-brands fa-whatsapp" style="font-size: 18px;"></i> <span>Simpan & Kirim via WhatsApp</span>`;
-
+                    btnSubmit.innerHTML = `<i class="fa-brands fa-whatsapp"></i> <span>Simpan & Kirim via WhatsApp</span>`;
                     form.reset();
                     window.open(urlWA, '_blank');
                 })
                 .catch(error => {
-                    alert('Gagal menyimpan laporan. Silakan periksa koneksi internet Anda dan coba lagi.');
-                    console.error('Error!', error.message);
+                    alert('Gagal mengirim laporan. Periksa koneksi Anda.');
                     btnSubmit.disabled = false;
-                    btnSubmit.innerHTML = `<i class="fa-brands fa-whatsapp" style="font-size: 18px;"></i> <span>Simpan & Kirim via WhatsApp</span>`;
+                    btnSubmit.innerHTML = `<i class="fa-brands fa-whatsapp"></i> <span>Simpan & Kirim via WhatsApp</span>`;
                 });
         });
     </script>
-
 </body>
 </html>
